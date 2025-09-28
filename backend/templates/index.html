@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PDF RAG Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .progress { height: 24px; background: #eee; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .bar { height: 100%; background: #4CAF50; width: 0; color: white; text-align: center; }
+    #log { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 8px; }
+    .phase-title { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <h2>Upload PDF for RAG Processing</h2>
+  <form id="uploadForm">
+    <input type="file" id="pdfFile" accept="application/pdf" />
+    <button type="submit">Upload</button>
+  </form>
+
+  <h3 class="phase-title">Extraction</h3>
+  <div class="progress"><div id="extractBar" class="bar"></div></div>
+
+  <h3 class="phase-title">Chunking</h3>
+  <div class="progress"><div id="chunkBar" class="bar"></div></div>
+
+  <h3 class="phase-title">Indexing</h3>
+  <div class="progress"><div id="indexBar" class="bar"></div></div>
+
+  <h3>Live Log</h3>
+  <div id="log"></div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('pdfFile');
+      const file = fileInput.files[0];
+      if (!file) return alert('Please choose a PDF');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/upload-pdf', { method: 'POST', body: formData });
+      const data = await res.json();
+      startWebSocket(data.job_id);
+    });
+
+    function startWebSocket(job_id) {
+      const wsUrl = `${location.origin.replace('http','ws')}/ws/${job_id}`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data).update;
+        const logDiv = document.getElementById('log');
+        const p = document.createElement('p');
+        p.textContent = `[${msg.phase}] ${msg.message}`;
+        logDiv.appendChild(p);
+        logDiv.scrollTop = logDiv.scrollHeight;
+
+        if (msg.phase === 'extraction') updateBar('extractBar', msg.percent);
+        if (msg.phase === 'chunking') updateBar('chunkBar', msg.percent);
+        if (msg.phase === 'indexing') updateBar('indexBar', msg.percent);
+      };
+    }
+
+    function updateBar(barId, percent) {
+      const bar = document.getElementById(barId);
+      bar.style.width = percent + '%';
+      bar.textContent = percent + '%';
+    }
+  </script>
+</body>
+</html>

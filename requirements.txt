@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+celery[redis]
+redis
+pymupdf
+langchain
+chromadb
+openai
+python-dotenv
+jinja2
+selenium
