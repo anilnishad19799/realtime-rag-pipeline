@@ -1,18 +1,15 @@
 import os
 import chromadb
-from openai import OpenAI
-from chromadb.utils import embedding_functions
+from langchain.embeddings.openai import OpenAIEmbeddings
 from dotenv import load_dotenv
+
 load_dotenv()
 
 CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "global_rag_collection"
 
 client = chromadb.PersistentClient(path=CHROMA_PATH)
-openai_emb = embedding_functions.OpenAIEmbeddingFunction(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    model_name="text-embedding-3-small"
-)
+openai_emb = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 def index_chunks(chunks, source_name, job_id):
     collection = client.get_or_create_collection(

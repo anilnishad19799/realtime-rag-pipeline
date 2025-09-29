@@ -5,9 +5,13 @@ from .chunking import chunk_text
 from .indexing import index_chunks
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
 celery = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
+"""
+It will publish each progress it track to websocket
+"""
 def publish(job_id, phase, percent, message):
     r.publish(f"progress_{job_id}", json.dumps({
         "phase": phase,
@@ -15,6 +19,10 @@ def publish(job_id, phase, percent, message):
         "message": message
     }))
 
+
+"""
+celery take task from redis as soon as new task assigned to redis
+"""
 @celery.task
 def process_pdf(pdf_path, job_id):
     # Extract
