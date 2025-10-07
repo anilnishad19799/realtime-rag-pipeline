@@ -1,24 +1,47 @@
 import os
-import chromadb
-from openai import OpenAI
-from chromadb.utils import embedding_functions
 from dotenv import load_dotenv
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_core.documents import Document
+from langchain_chroma import Chroma
+from uuid import uuid4
+
 load_dotenv()
 
-CHROMA_PATH = "chroma_db"
-COLLECTION_NAME = "global_rag_collection"
+# ------------------------------
+# Paths & config
+# ------------------------------
+VECTOR_STORE_PATH = "/app/chroma_db"  # absolute path inside container
+VECTOR_STORE_COLLECTION = "global_rag_collection"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-client = chromadb.PersistentClient(path=CHROMA_PATH)
-openai_emb = embedding_functions.OpenAIEmbeddingFunction(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    model_name="text-embedding-3-small"
-)
 
 def index_chunks(chunks, source_name, job_id):
-    collection = client.get_or_create_collection(
-        COLLECTION_NAME, embedding_function=openai_emb
+    """
+    Index chunks safely into Chroma inside Celery task.
+    """
+
+    # 1️⃣ Initialize Chroma inside the task
+    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+    vector_store = Chroma(
+        persist_directory=VECTOR_STORE_PATH,
+        collection_name=VECTOR_STORE_COLLECTION,
+        embedding_function=embeddings,
     )
-    ids = [f"{job_id}_{i}" for i in range(len(chunks))]
-    metas = [{"source": source_name, "job_id": job_id, "chunk_id": i} for i in range(len(chunks))]
-    collection.add(documents=chunks, ids=ids, metadatas=metas)
+
+    # 2️⃣ Prepare Document objects
+    documents = [
+        Document(page_content=chunk, metadata={"source": source_name, "chunk_id": i})
+        for i, chunk in enumerate(chunks)
+    ]
+    ids = [str(uuid4()) for _ in documents]
+
+    # 3️⃣ Add to vector store
+    vector_store.add_documents(documents=documents, ids=ids)
+
+    # 4️⃣ Persist explicitly
+    # vector_store.persist()
+
+    print(
+        f"✅ Indexed {len(chunks)} chunks into '{VECTOR_STORE_COLLECTION}' at '{VECTOR_STORE_PATH}'"
+    )
     return len(chunks)
