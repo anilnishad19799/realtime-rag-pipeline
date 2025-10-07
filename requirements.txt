@@ -12,9 +12,5 @@ selenium
 python-multipart
 langchain-community
 tiktoken
-<<<<<<< HEAD
 langchain_openai
 langchain-chroma
-=======
-langchain_openai
->>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
