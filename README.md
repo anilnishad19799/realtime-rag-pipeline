@@ -10,7 +10,6 @@ This project demonstrates how to handle **long-running ML or indexing jobs** wit
 - **Text chunking** using LangChain’s RecursiveCharacterTextSplitter
 - **Vector embeddings & indexing** using OpenAI embeddings + ChromaDB
 - **Live dashboard** to visualize extraction, chunking, and indexing progress
-- **Selenium integration** to automate PDF uploads and monitor real-time progress
 
 ---
 

@@ -12,13 +12,20 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="backend/templates"), name="static")
 templates = Jinja2Templates(directory="backend/templates")
 
+<<<<<<< HEAD
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+=======
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -33,7 +40,10 @@ async def upload_pdf(file: UploadFile):
     process_pdf.delay(out_path, job_id)
     return {"job_id": job_id}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 @app.post("/ask")
 async def ask_question_endpoint(data: dict):
     question = data.get("question")
@@ -42,7 +52,10 @@ async def ask_question_endpoint(data: dict):
     answer = ask_question(question)
     return {"answer": answer}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 @app.websocket("/ws/{job_id}")
 async def websocket_endpoint(ws: WebSocket, job_id: str):
     await ws.accept()

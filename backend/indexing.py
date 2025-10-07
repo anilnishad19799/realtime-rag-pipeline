@@ -1,9 +1,15 @@
 import os
+<<<<<<< HEAD
 from dotenv import load_dotenv
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from uuid import uuid4
+=======
+import chromadb
+from langchain.embeddings.openai import OpenAIEmbeddings
+from dotenv import load_dotenv
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 
 load_dotenv()
 
@@ -14,6 +20,11 @@ VECTOR_STORE_PATH = "/app/chroma_db"  # absolute path inside container
 VECTOR_STORE_COLLECTION = "global_rag_collection"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+<<<<<<< HEAD
+=======
+client = chromadb.PersistentClient(path=CHROMA_PATH)
+openai_emb = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 
 def index_chunks(chunks, source_name, job_id):
     """

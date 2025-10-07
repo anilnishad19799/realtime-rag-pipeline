@@ -22,8 +22,11 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./uploads:/app/uploads
+<<<<<<< HEAD
       - ./data:/app/data
       - ./chroma_db:/app/chroma_db
+=======
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
     depends_on:
       - redis
 
@@ -32,6 +35,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: worker
+<<<<<<< HEAD
     command: celery -A backend.celery_tasks.celery worker --loglevel=INFO --concurrency=1
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -42,6 +46,15 @@ services:
       - ./uploads:/app/uploads
       - ./data:/app/data
       - ./chroma_db:/app/chroma_db
+=======
+    command: celery -A backend.celery_tasks.celery worker --loglevel=INFO
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./backend:/app/backend
+      - ./uploads:/app/uploads
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
     depends_on:
       - redis
 

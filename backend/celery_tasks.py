@@ -8,6 +8,7 @@ from backend.indexing import index_chunks
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
 
+<<<<<<< HEAD
 celery = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
@@ -25,6 +26,27 @@ def publish(job_id, phase, percent, message):
 # ------------------------------
 # Celery task: process PDF → extract → chunk → index
 # ------------------------------
+=======
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+celery = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
+r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+
+"""
+It will publish each progress it track to websocket
+"""
+def publish(job_id, phase, percent, message):
+    r.publish(f"progress_{job_id}", json.dumps({
+        "phase": phase,
+        "percent": percent,
+        "message": message
+    }))
+
+
+"""
+celery take task from redis as soon as new task assigned to redis
+"""
+>>>>>>> 6ceebea9ac7cd2a11e5830be9bd21b267c8055d8
 @celery.task
 def process_pdf(pdf_path, job_id):
     """
