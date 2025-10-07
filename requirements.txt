@@ -9,3 +9,8 @@ openai
 python-dotenv
 jinja2
 selenium
+python-multipart
+langchain-community
+tiktoken
+langchain_openai
+langchain-chroma
