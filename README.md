@@ -34,7 +34,7 @@ This project demonstrates how to handle **long-running ML or indexing jobs** wit
 - **LangChain** – recursive character chunking  
 - **OpenAI** – embeddings for vectorization  
 - **ChromaDB** – local vector database for RAG indexing  
-- **Selenium** – optional automated PDF uploader & live dashboard viewer  
+- **Websocket** – for having long live connection  
 
 ---
 
